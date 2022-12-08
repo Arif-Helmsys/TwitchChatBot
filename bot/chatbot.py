@@ -5,17 +5,17 @@ from colorama import Fore,init
 
 init(autoreset=True)
 class ConnecTwitchChatBot:
-    def __init__(self,streamer:str,oauth:str) -> None:
+    def __init__(self,streamer:str,oauth:str,botname:str) -> None:
+        self.botname = botname
         self.streamer = streamer.lower()
         self.oauth = oauth
         self.socket = socket.socket()
         self.socket.connect(("irc.chat.twitch.tv",6667))
-
+        
     async def connectTwitch(self):
-        oauth = "oauth:js70lrk3tx7l1k6iip6plphay428qw"
         sends = [
             self.send(self.socket,f"PASS oauth:{self.oauth}"),
-            self.send(self.socket,f"NICK HelmsysB0T"),
+            self.send(self.socket,f"NICK {self.botname}"),
             self.send(self.socket,f"JOIN #{self.streamer}"),
             self.send(self.socket,f"CAP REQ :twitch.tv/tags"),
             self.send(self.socket,f"CAP REQ :twitch.tv/commands")
@@ -27,7 +27,7 @@ class ConnecTwitchChatBot:
         return socket.send(bytes(msg+"\n","utf-8"))
 
     async def recv(self,socket:socket.socket):
-        return socket.recv(1024).decode('utf-8')
+        return socket.recv(4096).decode('utf-8')
 
     async def __run(self) -> None:
         if await self.recv(self.socket) != '' or await self.recv(self.socket) != None:
@@ -36,7 +36,7 @@ class ConnecTwitchChatBot:
                     msg = await self.recv(self.socket)
                     # print(msg)
                     parse = self.__messageParse(msg.replace("\n",''))
-                    print(f"[{str(datetime.datetime.fromtimestamp(datetime.datetime.now().timestamp())).split(chr(32))[1]}] ~ {parse['name']}{Fore.YELLOW} >>>{Fore.RESET} {parse['msg']}")
+                    print(f"[{str(datetime.datetime.fromtimestamp(datetime.datetime.now().timestamp())).split(chr(32))[1]}] ~ {parse['name']}{Fore.YELLOW} >>>{Fore.LIGHTYELLOW_EX} {parse['msg']}")
                     # await self.__chatCommands(parse["msg"])
                 except (IndexError,TypeError):
                     pass
@@ -68,20 +68,20 @@ class ConnecTwitchChatBot:
                 sub = True
                            
             if mod:
-                return_data.update({ "name" : f"[{Fore.GREEN}MOD{Fore.RESET}]{'':<4}{Fore.GREEN}{parse_data['display-name']}", "msg" : f"{Fore.GREEN}{parse_data['user-type']['MESSAGE']}"})
+                return_data.update({ "name" : f"[{Fore.GREEN}MOD{Fore.RESET}]{'':<4}{Fore.GREEN}{parse_data['display-name']}", "msg" : f"{parse_data['user-type']['MESSAGE']}"})
                 return return_data
 
             if sub:
-                return_data.update({ "name" : f"[{Fore.LIGHTRED_EX}ABONE{Fore.RESET}]{'':<2}{Fore.LIGHTRED_EX}{parse_data['display-name']}", "msg" : f"{Fore.LIGHTRED_EX}{parse_data['user-type']['MESSAGE']}"})
+                return_data.update({ "name" : f"[{Fore.LIGHTRED_EX}ABONE{Fore.RESET}]{'':<2}{Fore.LIGHTRED_EX}{parse_data['display-name']}", "msg" : f"{parse_data['user-type']['MESSAGE']}"})
                 return return_data
 
             if not sub or not mod:
-                return_data.update({ "name" : f"[{Fore.CYAN}PLEB{Fore.RESET}]{'':<3}{Fore.CYAN}{parse_data['display-name']}", "msg" : f"{Fore.CYAN}{parse_data['user-type']['MESSAGE']}"})
+                return_data.update({ "name" : f"[{Fore.CYAN}PLEB{Fore.RESET}]{'':<3}{Fore.CYAN}{parse_data['display-name']}", "msg" : f"{parse_data['user-type']['MESSAGE']}"})
                 return return_data
         except KeyError:
             pass
     
-    async def __chatCommands(self,msg:str,handle:str='!'):
-        print(msg,msg.startswith(handle))
-        if msg.startswith(handle):
-            await self.send(self.socket,f"PRIVMSG #{self.streamer} : sa")
+    # async def __chatCommands(self,msg:str):
+    #     # print("msg",msg)
+    #     if msg.startswith():
+    #             await self.send(self.socket,f"PRIVMSG #{self.streamer} : /me sa")
