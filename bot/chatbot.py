@@ -35,9 +35,12 @@ class ConnecTwitchChatBot:
                 try:
                     msg = await self.recv(self.socket)
                     # print(msg)
-                    parse = self.__messageParse(msg.replace("\n",''))
-                    print(f"[{str(datetime.datetime.fromtimestamp(datetime.datetime.now().timestamp())).split(chr(32))[1]}] ~ {parse['name']}{Fore.YELLOW} >>>{Fore.LIGHTYELLOW_EX} {parse['msg']}")
-                    # await self.__chatCommands(parse["msg"])
+                    if msg == "PING :tmi.twitch.tv":
+                        self.send(self.socket,"PONG :tmi.twitch.tv")
+                    else:
+                        parse = self.__messageParse(msg.replace("\n",''))
+                        print(f"[{str(datetime.datetime.fromtimestamp(datetime.datetime.now().timestamp())).split(chr(32))[1]}] ~ {parse['name']}{Fore.YELLOW} >>>{Fore.LIGHTYELLOW_EX} {parse['msg']}")
+                        # await self.__chatCommands(parse["msg"])
                 except (IndexError,TypeError):
                     pass
                 except TimeoutError:
