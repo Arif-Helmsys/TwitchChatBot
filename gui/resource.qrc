@@ -1,6 +1,0 @@
-<RCC>
-  <qresource prefix="prfx">
-    <file>github.ico</file>
-    <file>twitch_icon.ico</file>
-  </qresource>
-</RCC>
